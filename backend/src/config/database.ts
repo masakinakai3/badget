@@ -6,8 +6,11 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-// DBファイルのパス（プロジェクトルートの data ディレクトリ下に作成）
-const dataDir = path.resolve(__dirname, '../../data');
+// DBファイルのパス（環境変数 DATA_DIR または 実行ファイルと同じ場所を優先）
+const isPkg = (process as any).pkg !== undefined;
+const baseDir = isPkg ? path.dirname(process.execPath) : path.resolve(__dirname, '../../');
+const dataDir = process.env.DATA_DIR || path.join(baseDir, 'data');
+
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
