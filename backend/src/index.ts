@@ -63,10 +63,7 @@ app.use('/api/budget_plans', budgetPlanRoutes);
 app.use('/api/expenses', expenseRoutes);
 
 // Serve Static Frontend (for production/exe)
-// Serve Static Frontend (for production/exe)
-const frontendDist = isPkg
-    ? path.join(__dirname, '../frontend/dist') // pkg internally maps this
-    : path.join(__dirname, '../../frontend/dist');
+const frontendDist = path.join(__dirname, '../../frontend/dist');
 
 app.use(express.static(frontendDist));
 
