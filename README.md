@@ -1,74 +1,74 @@
-# BudgetMaster - 予算管理アプリ
+# BudgetMaster - Budget Management App
 
-BudgetMaster は、プロジェクトごとの予算計画と支出実績を月単位で管理するためのローカル Web アプリケーションです。
-React (Vite) と Node.js (Express) をベースにし、データベースに SQLite を使用しています。
+BudgetMaster is a local web application for managing project budget plans and actual expenditures on a monthly basis.
+It is built on React (Vite) and Node.js (Express), using SQLite as the database.
 
-## 主な機能
+## Key Features
 
-- **プロジェクト管理**: 期間（半期）と総予算の設定
-- **予算管理マトリックス**:
-  - 月別・カテゴリ別の予定金額の直接編集
-  - 実績合計（完了・未完了別）の表示
-  - 予算 vs 実績の差額（乖離）の自動計算
-  - CSV エクスポート機能
-- **支出実績の登録**: カテゴリ、発生月、金額、備考の入力
-- **ダッシュボード**: 全プロジェクトの予算消化状況をサマリー表示
-- **カテゴリ管理**: 全プロジェクト共通の支出項目管理と、プロジェクトごとの紐付け
-- **レポート**: プロジェクトごとの予算対実績グラフ (Recharts)
+- **Project Management**: Set project duration (half-year period) and total budget
+- **Budget Management Matrix**:
+  - Directly edit planned amounts by month and category
+  - View actual totals (completed and in-progress)
+  - Automatic calculation of budget vs. actual variance
+  - CSV export functionality
+- **Expenditure Recording**: Enter category, month incurred, amount, and notes
+- **Dashboard**: Summary view of budget utilization across all projects
+- **Category Management**: Manage expense items shared across all projects and link them to individual projects
+- **Reports**: Budget vs. actual charts per project (Recharts)
 
-## 技術スタック
+## Tech Stack
 
-- **フロントエンド**: React, TypeScript, Tailwind CSS, Lucide React, Recharts
-- **バックエンド**: Node.js, Express, SQLite3 (sqlite3), TypeScript
+- **Frontend**: React, TypeScript, Tailwind CSS, Lucide React, Recharts
+- **Backend**: Node.js, Express, SQLite3 (sqlite3), TypeScript
 
-## セットアップと起動方法
+## Setup and Launch
 
-プロジェクトはバックエンド（API）とフロントエンド（UI）の 2 つの構成になっています。
+The project consists of two parts: a backend (API) and a frontend (UI).
 
-### 事前準備
+### Prerequisites
 
-- Node.js (v18 以上推奨) がインストールされていること
+- Node.js (v18 or higher recommended) must be installed
 
-### 1. バックエンドの起動
+### 1. Start the Backend
 
 ```bash
 cd backend
-npm install  # 初回セットアップ時のみ
+npm install  # Only required on first setup
 npm run dev
 ```
 
-- `http://localhost:5000` でサーバーが起動します。
-- 初回起動時に `backend/data/database.sqlite` が自動生成されます。
+- The server will start at `http://localhost:5000`.
+- On first launch, `backend/data/database.sqlite` will be created automatically.
 
-### 2. フロントエンドの起動
+### 2. Start the Frontend
 
 ```bash
 cd frontend
-npm install  # 初回セットアップ時のみ
+npm install  # Only required on first setup
 npm run dev
 ```
 
-- `http://localhost:5173` でアプリケーションにアクセスできます。
+- The application will be accessible at `http://localhost:5173`.
 
-### 3. スタンドアロン実行ファイル (.exe) の作成
+### 3. Build a Standalone Executable (.exe)
 
-Node.js をインストールしていない環境でも、ダブルクリックするだけでサーバーが立ち上がり、ブラウザが自動で起動する `.exe` ファイルを作成できます。
+You can create a `.exe` file that starts the server and automatically opens a browser with a double-click, even in environments without Node.js installed.
 
 ```bash
-# ルート配下で実行
+# Run from the root directory
 npm install
 npm run build:exe
 ```
 
-- `dist/BudgetMaster.exe` が生成されます。
-- 初回起動時、ブラウザが `http://localhost:5000` を自動的に開きます。
+- `dist/BudgetMaster.exe` will be generated.
+- On first launch, the browser will automatically open `http://localhost:5000`.
 
-## 開発・構成
+## Development & Structure
 
-- `frontend/`: React アプリケーションソース
-- `backend/`: Express API サーバーソース
-- `doc/`: ソフトウェア仕様書・[利用マニュアル](doc/user_manual.md)
+- `frontend/`: React application source
+- `backend/`: Express API server source
+- `doc/`: Software specification and [User Manual](doc/user_manual.md)
 
-## ライセンス
+## License
 
 [MIT License](LICENSE)
