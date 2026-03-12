@@ -21,7 +21,7 @@ const ExpenseForm = ({ projectId, categories }: ExpenseFormProps) => {
     const [amount, setAmount] = useState('');
     const [note, setNote] = useState('');
     const [loading, setLoading] = useState(false);
-    const [isCompleted, setIsCompleted] = useState(false);
+    const [isCompleted, setIsCompleted] = useState<number>(0);
 
     // default yearMonth to the YYYY-MM of the selected date
     const yearMonth = date ? date.substring(0, 7) : '';
@@ -33,15 +33,15 @@ const ExpenseForm = ({ projectId, categories }: ExpenseFormProps) => {
         setLoading(true);
         try {
             if (editingExpenseId) {
-                await updateExpense(editingExpenseId, Number(categoryId), yearMonth, date, Number(amount) * 10000, note, isCompleted);
+                await updateExpense(editingExpenseId, Number(categoryId), yearMonth, date, Number(amount) * 10000, note, isCompleted as number);
                 setEditingExpenseId(null);
             } else {
-                await saveExpense(Number(categoryId), yearMonth, date, Number(amount) * 10000, note, isCompleted);
+                await saveExpense(Number(categoryId), yearMonth, date, Number(amount) * 10000, note, isCompleted as number);
             }
             // Reset form on success
             setAmount('');
             setNote('');
-            setIsCompleted(false);
+            setIsCompleted(0);
             // keep category and date as they might enter multiple for the same day/cat
         } catch (err) {
             console.error('Failed to save expense', err);
@@ -56,14 +56,14 @@ const ExpenseForm = ({ projectId, categories }: ExpenseFormProps) => {
         setDate(exp.date);
         setAmount((exp.actual_amount / 10000).toString());
         setNote(exp.note || '');
-        setIsCompleted(Boolean(exp.is_completed));
+        setIsCompleted(Number(exp.is_completed) || 0);
     };
 
     const handleCancelEdit = () => {
         setEditingExpenseId(null);
         setAmount('');
         setNote('');
-        setIsCompleted(false);
+        setIsCompleted(0);
     };
 
     return (
@@ -129,19 +129,23 @@ const ExpenseForm = ({ projectId, categories }: ExpenseFormProps) => {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                     placeholder="購入先や詳細など"
                                 />
-                                <div className="mt-4 flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id="completed"
-                                        checked={isCompleted}
-                                        onChange={e => setIsCompleted(e.target.checked)}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                    />
-                                    <label htmlFor="completed" className="ml-2 block text-sm text-gray-900">
-                                        完了（予算の実績に反映する）
-                                    </label>
-                                </div>
                             </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="completed" className="block text-sm font-medium text-gray-700 mb-1">
+                                ステータス
+                            </label>
+                            <select
+                                id="completed"
+                                value={isCompleted}
+                                onChange={e => setIsCompleted(Number(e.target.value))}
+                                className="w-full md:w-auto px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                            >
+                                <option value={0}>未完了</option>
+                                <option value={1}>完了（実績に反映）</option>
+                                <option value={2}>金額未確定</option>
+                            </select>
                         </div>
 
                         <div className="flex justify-end space-x-2 pt-2">
@@ -181,6 +185,7 @@ const ExpenseForm = ({ projectId, categories }: ExpenseFormProps) => {
                                         <span className="font-medium text-gray-800">
                                             {catName} <span className="text-gray-400 font-normal ml-2">{exp.date}</span>
                                             {exp.is_completed === 1 && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">完了</span>}
+                                            {exp.is_completed === 2 && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">金額未確定</span>}
                                         </span>
                                         {exp.note && <span className="text-gray-500 text-xs mt-1">{exp.note}</span>}
                                     </div>

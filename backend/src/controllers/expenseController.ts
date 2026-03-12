@@ -28,7 +28,8 @@ export const createExpense = (req: Request, res: Response): void => {
         return;
     }
 
-    const isCompletedVal = is_completed ? 1 : 0;
+    // 0=未完了, 1=完了, 2=金額未確定
+    const isCompletedVal = typeof is_completed === 'number' ? is_completed : (is_completed ? 1 : 0);
 
     db.run(
         'INSERT INTO expenses (project_id, category_id, year_month, date, actual_amount, note, is_completed) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -63,7 +64,8 @@ export const updateExpense = (req: Request, res: Response): void => {
         return;
     }
 
-    const isCompletedVal = is_completed ? 1 : 0;
+    // 0=未完了, 1=完了, 2=金額未確定
+    const isCompletedVal = typeof is_completed === 'number' ? is_completed : (is_completed ? 1 : 0);
 
     db.run(
         'UPDATE expenses SET category_id = ?, year_month = ?, date = ?, actual_amount = ?, note = ?, is_completed = ? WHERE id = ?',

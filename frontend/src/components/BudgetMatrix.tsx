@@ -53,9 +53,9 @@ const BudgetMatrix = ({ projectId, termStart, termEnd, categories }: BudgetMatri
         );
     };
 
-    const handleToggleCompletion = async (exp: any, isCompleted: boolean) => {
+    const handleToggleCompletion = async (exp: any, statusValue: number) => {
         try {
-            await updateExpense(exp.id, exp.category_id, exp.year_month, exp.date, exp.actual_amount, exp.note || '', isCompleted);
+            await updateExpense(exp.id, exp.category_id, exp.year_month, exp.date, exp.actual_amount, exp.note || '', statusValue);
         } catch (err) {
             console.error('Failed to toggle completion', err);
         }
@@ -76,6 +76,15 @@ const BudgetMatrix = ({ projectId, termStart, termEnd, categories }: BudgetMatri
         return expenses
             .filter(e => e.category_id === catId && e.year_month === month)
             .reduce((sum, e) => sum + e.actual_amount, 0);
+    };
+
+    // 金額未確定(is_completed===2)の支出が存在するかチェック
+    const hasUndeterminedExpense = (catId: number, month?: string) => {
+        return expenses.some(e =>
+            e.category_id === catId &&
+            (month ? e.year_month === month : true) &&
+            e.is_completed === 2
+        );
     };
 
     const handlePlanClick = (catId: number, month: string, currentAmount: number) => {
@@ -104,7 +113,7 @@ const BudgetMatrix = ({ projectId, termStart, termEnd, categories }: BudgetMatri
         const amount = Number(expenseEditAmount) * 10000;
         const newYearMonth = expenseEditDate.substring(0, 7); // Calculate YYYY-MM from YYYY-MM-DD
         if (!isNaN(amount)) {
-            await updateExpense(exp.id, exp.category_id, newYearMonth, expenseEditDate, amount, expenseEditNote, Boolean(exp.is_completed));
+            await updateExpense(exp.id, exp.category_id, newYearMonth, expenseEditDate, amount, expenseEditNote, Number(exp.is_completed));
         }
         setEditingExpense(null);
     };
@@ -196,7 +205,7 @@ const BudgetMatrix = ({ projectId, termStart, termEnd, categories }: BudgetMatri
                     });
                     detailRow.push(''); // Total column intentionally blank for single item
 
-                    const statusText = exp.is_completed ? '[完] ' : '[未] ';
+                    const statusText = exp.is_completed === 1 ? '[完] ' : exp.is_completed === 2 ? '[未確定] ' : '[未] ';
                     const noteText = exp.note || '';
                     detailRow.push(`${statusText}${noteText}`);
                     csvRows.push(detailRow);
@@ -310,7 +319,7 @@ const BudgetMatrix = ({ projectId, termStart, termEnd, categories }: BudgetMatri
                                                                 onClick={() => handlePlanClick(cat.id, m, amount)}
                                                             >
                                                                 <span>{formatCurrency(amount)}</span>
-                                                                <span className="text-[10px] text-gray-500 font-normal">
+                                                                <span className={`text-[10px] font-normal ${hasUndeterminedExpense(cat.id, m) ? 'text-blue-600 font-bold' : 'text-gray-500'}`}>
                                                                     ({formatCurrency(getAllExpenseTotal(cat.id, m))})
                                                                 </span>
                                                             </div>
@@ -321,7 +330,7 @@ const BudgetMatrix = ({ projectId, termStart, termEnd, categories }: BudgetMatri
                                             <td className="px-4 py-2 text-right font-bold bg-blue-50/30">
                                                 <div className="flex flex-col items-end">
                                                     <span>{formatCurrency(catPlanTotal)}</span>
-                                                    <span className="text-[10px] text-gray-500 font-normal">
+                                                    <span className={`text-[10px] font-normal ${hasUndeterminedExpense(cat.id) ? 'text-blue-600 font-bold' : 'text-gray-500'}`}>
                                                         ({formatCurrency(months.reduce((sum, m) => sum + getAllExpenseTotal(cat.id, m), 0))})
                                                     </span>
                                                 </div>
@@ -427,15 +436,18 @@ const BudgetMatrix = ({ projectId, termStart, termEnd, categories }: BudgetMatri
                                                                                     <div className="flex justify-between items-center text-gray-500 mb-0.5">
                                                                                         <span>{exp.date}</span>
                                                                                         <div className="flex items-center space-x-1.5">
-                                                                                            <input
-                                                                                                type="checkbox"
-                                                                                                checked={exp.is_completed === 1}
-                                                                                                onChange={(e) => handleToggleCompletion(exp, e.target.checked)}
-                                                                                                className="h-3 w-3 text-blue-600 rounded border-gray-300 cursor-pointer"
-                                                                                                title="完了（実績に反映）"
-                                                                                            />
+                                                                                            <select
+                                                                                                value={exp.is_completed}
+                                                                                                onChange={(e) => handleToggleCompletion(exp, Number(e.target.value))}
+                                                                                                className="text-[10px] px-1 py-0 border border-gray-300 rounded cursor-pointer bg-white"
+                                                                                                title="ステータス"
+                                                                                            >
+                                                                                                <option value={0}>未</option>
+                                                                                                <option value={1}>完了</option>
+                                                                                                <option value={2}>未確定</option>
+                                                                                            </select>
                                                                                             <span
-                                                                                                className={`font-medium cursor-pointer hover:bg-red-100 rounded px-1 transition-colors ${exp.is_completed === 1 ? 'text-gray-700' : 'text-gray-400'}`}
+                                                                                                className={`font-medium cursor-pointer hover:bg-red-100 rounded px-1 transition-colors ${exp.is_completed === 1 ? 'text-gray-700' : exp.is_completed === 2 ? 'text-yellow-600' : 'text-gray-400'}`}
                                                                                                 onClick={() => handleExpenseClick(exp)}
                                                                                                 title="金額または備考を編集"
                                                                                             >

@@ -47,7 +47,7 @@ export const useBudget = (projectId: number | undefined) => {
         }
     };
 
-    const saveExpense = async (categoryId: number, yearMonth: string, date: string, amount: number, note: string, is_completed: boolean = false) => {
+    const saveExpense = async (categoryId: number, yearMonth: string, date: string, amount: number, note: string, is_completed: number = 0) => {
         if (!projectId) return;
         try {
             await api.post('/expenses', {
@@ -77,7 +77,7 @@ export const useBudget = (projectId: number | undefined) => {
         }
     };
 
-    const updateExpense = async (id: number, categoryId: number, yearMonth: string, date: string, amount: number, note: string, is_completed: boolean = false) => {
+    const updateExpense = async (id: number, categoryId: number, yearMonth: string, date: string, amount: number, note: string, is_completed: number = 0) => {
         try {
             await api.put(`/expenses/${id}`, {
                 category_id: categoryId,
